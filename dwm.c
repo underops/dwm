@@ -241,7 +241,7 @@ static char stext[256];
 static int screen;
 static int sw, sh;           /* X display screen geometry width, height */
 static int bh, blw = 0;      /* bar geometry */
-static int effect_switch = 0;
+static int anim_switch = 0;
 static int lrpad;            /* sum of left and right padding for text */
 static int (*xerrorxlib)(Display *, XErrorEvent *);
 static unsigned int numlockmask = 0;
@@ -818,14 +818,14 @@ drawbar(Monitor *m)
 	drw_setscheme(drw, scheme[SchemeNorm]);
 	x = drw_text(drw, x, 0, w, bh, lrpad / 2, m->ltsymbol, 0);
 
-    if(bar_effect)
+    if(bar_anim && m->sel)
     {
-        drw_setscheme(drw, scheme[SchemeSel]);
-        effect_switch = 1-effect_switch;
-        drw_rect(drw, x, 0, bh, bh, 1, 0);
-        for(int i = 0; i < bh; i++)
-            drw_rect(drw, x + effect_switch%2*(bh-i-1), i,
-                effect_switch%2 ? i+1 : bh-i, 1, 1, 1);
+        anim_switch = 1-anim_switch;
+    	drw_setscheme(drw, scheme[SchemeSel]);
+        drw_rect(drw, x, 0, bh, bh, 1, 2);
+        for(i = 0; i < bh; i++)
+            drw_rect(drw, x + anim_switch%2*(bh-i-1), i,
+                anim_switch%2 ? i+1 : bh-i, 1, 1, 1);
         x += bh;
     }
 
