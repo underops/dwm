@@ -4,22 +4,24 @@
 static const unsigned int borderpx  = 1;        /* border pixel of windows */
 static const unsigned int gappx     = 6;        /* gaps between windows */
 static const unsigned int snap      = 32;       /* snap pixel */
+static const int swallowfloating    = 0;	/* 1 means swallow floating windows by default */
 static const int showbar            = 1;        /* 0 means no bar */
 static const int topbar             = 1;        /* 0 means bottom bar */
-static const int bar_anim			= 1;		/* 0 means no animation */
-static const char *fonts[]          = { "Misc terminusmodx:size=9" };
-static const char dmenufont[]       = "Misc terminusmodx:size=12";
+static const int bar_anim           = 1;        /* 0 means no animation */
+static const char *fonts[]          = { "Misc terminusmodx:size=9", "unifont:size=14" };
+static const char dmenufont[]       = "Hack:size=10";
+static const char col_gray0[]       = "#0c0c0c";
 static const char col_gray1[]       = "#222222";
-static const char col_gray2[]       = "#444444";
+static const char col_gray2[]       = "#333333";
 static const char col_gray3[]       = "#bbbbbb";
 static const char col_gray4[]       = "#eeeeee";
 static const char col_cyan[]        = "#005577";
-static const unsigned int baralpha = 0xd0;
+static const unsigned int baralpha  = 0xb2;
 static const unsigned int borderalpha = OPAQUE;
 static const char *colors[][3]      = {
 	/*               fg         bg         border   */
-	[SchemeNorm] = { col_gray3, col_gray1, col_gray2 },
-	[SchemeSel]  = { col_gray4, col_cyan,  col_cyan  },
+	[SchemeNorm] = { col_gray3, col_gray0, col_gray2 },
+	[SchemeSel]  = { col_gray4, col_cyan,  col_cyan },
 };
 static const unsigned int alphas[][3]      = {
 	/*               fg      bg        border     */
@@ -35,9 +37,12 @@ static const Rule rules[] = {
 	 *	WM_CLASS(STRING) = instance, class
 	 *	WM_NAME(STRING) = title
 	 */
-	/* class      instance    title       tags mask     isfloating   monitor */
-	{ "Gimp",     NULL,       NULL,       0,            1,           -1 },
-	{ "Firefox",  NULL,       NULL,       1 << 8,       0,           -1 },
+	/* class        instance  title         tags mask      isfloating isterminal noswallow  monitor */
+	{ "Gimp",       NULL,     NULL,           	0,         	1,      0,       0,     -1 },
+	{ "Firefox",    NULL,     NULL,           	1 << 8,    	0,      0,      -1,     -1 },
+//	{ "Alacritty",  NULL,     NULL,          	0,         	0,      1,      -1,     -1 },
+	{ NULL,         NULL,     "Event Tester", 	0,         	1,      0,      1,      -1 }, /* xev */
+	{ "Steam",      NULL,     "Lista de amigos",	0,	   	1,	0,	0,	-1 }
 };
 
 /* layout(s) */
@@ -65,20 +70,24 @@ static const Layout layouts[] = {
 
 /* commands */
 static char dmenumon[2] = "0"; /* component of dmenucmd, manipulated in spawn() */
-static const char *dmenucmd[] = { "dmenu_run", "-m", dmenumon, "-fn", dmenufont, "-nb", col_gray1, "-nf", col_gray3, "-sb", col_cyan, "-sf", col_gray4, NULL };
-static const char *termcmd[]  = { "alacritty", NULL };
+static const char *dmenucmd[]  = { "dmenu_run", "-m", dmenumon, "-fn", dmenufont, "-nb", col_gray1, "-nf", col_gray3, "-sb", col_cyan, "-sf", col_gray4, NULL };
+static const char *termcmd[]   = { "alacritty", NULL };
 static const char *scshotcmd[] = { "scrot", "/home/kauan/screenshots/%Y-%m-%d-%T-screenshot.png", NULL };
+static const char *dec_vol[]   = { "pactl", "set-sink-volume", "0", "-5%", NULL };
+static const char *inc_vol[]   = { "pactl", "set-sink-volume", "0", "+5%", NULL };
 
 static Key keys[] = {
 	/* modifier                     key        function        argument */
 	{ MODKEY,                       XK_d,      spawn,          {.v = dmenucmd } },
 	{ MODKEY,                       XK_Return, spawn,          {.v = termcmd } },
 	{ MODKEY|ShiftMask,             XK_p,      spawn,          {.v = scshotcmd } },
+	{ MODKEY,                       XK_minus,  spawn,          {.v = dec_vol } },
+	{ MODKEY,                       XK_equal,  spawn,          {.v = inc_vol } },
 	{ MODKEY,                       XK_b,      togglebar,      {0} },
 	{ MODKEY,                       XK_j,      focusstack,     {.i = +1 } },
 	{ MODKEY,                       XK_k,      focusstack,     {.i = -1 } },
 	{ MODKEY,                       XK_i,      incnmaster,     {.i = +1 } },
-    { MODKEY,                       XK_o,      incnmaster,     {.i = -1 } },
+	{ MODKEY,                       XK_o,      incnmaster,     {.i = -1 } },
 	{ MODKEY,                       XK_h,      setmfact,       {.f = -0.05} },
 	{ MODKEY,                       XK_l,      setmfact,       {.f = +0.05} },
 	{ MODKEY|Mod1Mask,              XK_Return, zoom,           {0} },
