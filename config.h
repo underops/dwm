@@ -8,7 +8,7 @@ static const int swallowfloating    = 0;	/* 1 means swallow floating windows by 
 static const int showbar            = 1;        /* 0 means no bar */
 static const int topbar             = 1;        /* 0 means bottom bar */
 static const int bar_anim           = 1;        /* 0 means no animation */
-static const char *fonts[]          = { "Misc terminusmodx:size=9", "unifont:size=14" };
+static const char *fonts[]          = { "Misc terminusmodx:size=9", "Hack:size=10" };
 static const char dmenufont[]       = "Hack:size=10";
 static const char col_gray0[]       = "#0c0c0c";
 static const char col_gray1[]       = "#222222";
@@ -39,7 +39,7 @@ static const Rule rules[] = {
 	 */
 	/* class        instance  title         tags mask      isfloating isterminal noswallow  monitor */
 	{ "Gimp",       NULL,     NULL,           	0,         	1,      0,       0,     -1 },
-	{ "Firefox",    NULL,     NULL,           	1 << 8,    	0,      0,      -1,     -1 },
+	{ "Firefox",    NULL,     NULL,           	0,    	0,      0,      -1,     -1 },
 //	{ "Alacritty",  NULL,     NULL,          	0,         	0,      1,      -1,     -1 },
 	{ NULL,         NULL,     "Event Tester", 	0,         	1,      0,      1,      -1 }, /* xev */
 	{ "Steam",      NULL,     "Lista de amigos",	0,	   	1,	0,	0,	-1 }
