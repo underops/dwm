@@ -29,6 +29,23 @@ typedef struct {
 	Fnt *fonts;
 } Drw;
 
+typedef struct {
+    float x, y;
+} vec2;
+
+typedef struct {
+    float x, y, z;
+} vec3;
+
+typedef struct {
+    vec3 v[3];
+} triangle;
+
+typedef struct {
+    triangle t[2];
+    float angle;
+} face;
+
 /* Drawable abstraction */
 Drw *drw_create(Display *dpy, int screen, Window win, unsigned int w, unsigned int h, Visual *visual, unsigned int depth, Colormap cmap);
 void drw_resize(Drw *drw, unsigned int w, unsigned int h);
@@ -54,6 +71,8 @@ void drw_setscheme(Drw *drw, Clr *scm);
 
 /* Drawing functions */
 void drw_rect(Drw *drw, int x, int y, unsigned int w, unsigned int h, int filled, int invert);
+void drw_line(Drw *drw, float x1, float x2, int y, unsigned int w, int x, unsigned long int color);
+void drw_triangle(Drw *drw, triangle *tr, int w, int x, unsigned long int color);
 int drw_text(Drw *drw, int x, int y, unsigned int w, unsigned int h, unsigned int lpad, const char *text, int invert);
 
 /* Map functions */

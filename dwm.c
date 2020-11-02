@@ -27,6 +27,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
+#include <math.h>
 #include <unistd.h>
 #include <sys/types.h>
 #include <sys/wait.h>
@@ -259,7 +260,6 @@ static int scanner;
 static int screen;
 static int sw, sh;           /* X display screen geometry width, height */
 static int bh, blw = 0;      /* bar geometry */
-static int anim_switch = 0;
 static int lrpad;            /* sum of left and right padding for text */
 static int (*xerrorxlib)(Display *, XErrorEvent *);
 static unsigned int numlockmask = 0;
@@ -1018,26 +1018,137 @@ drawbar(Monitor *m)
 
     if(bar_anim && m->sel)
     {
-        anim_switch += 1;
-        if(anim_switch > 3)
-            anim_switch = 0;
         drw_rect(drw, x, 0, bh, bh, 1, 1);
-        drw_setscheme(drw, scheme[SchemeSel]);
-        for(i = 0; i < bh; i++)
-        switch(anim_switch)
+        triangle t[] = {
+
+            {  -0.5f, -0.5f, -0.5f ,  -0.5f, -0.5f,  0.5f ,   0.5f, -0.5f, -0.5f  },
+            {  -0.5f, -0.5f,  0.5f ,   0.5f, -0.5f,  0.5f ,   0.5f, -0.5f, -0.5f  },
+
+            {  -0.5f,  0.5f, -0.5f ,  -0.5f,  0.5f,  0.5f ,   0.5f,  0.5f, -0.5f  },
+            {  -0.5f,  0.5f,  0.5f ,   0.5f,  0.5f,  0.5f ,   0.5f,  0.5f, -0.5f  },
+
+            {  -0.5f, -0.5f, -0.5f ,   0.5f, -0.5f, -0.5f ,  -0.5f,  0.5f, -0.5f  },
+            {   0.5f, -0.5f, -0.5f ,   0.5f,  0.5f, -0.5f ,  -0.5f,  0.5f, -0.5f  }, 
+            
+            {  -0.5f, -0.5f,  0.5f ,   0.5f, -0.5f,  0.5f ,  -0.5f,  0.5f,  0.5f  },
+            {   0.5f, -0.5f,  0.5f ,   0.5f,  0.5f,  0.5f ,  -0.5f,  0.5f,  0.5f  }, 
+
+            {  -0.5f, -0.5f, -0.5f ,  -0.5f, -0.5f,  0.5f ,  -0.5f,  0.5f, -0.5f  },
+            {  -0.5f, -0.5f,  0.5f ,  -0.5f,  0.5f,  0.5f ,  -0.5f,  0.5f, -0.5f  },
+
+            {   0.5f, -0.5f, -0.5f ,   0.5f, -0.5f,  0.5f ,   0.5f,  0.5f, -0.5f  },
+            {   0.5f, -0.5f,  0.5f ,   0.5f,  0.5f,  0.5f ,   0.5f,  0.5f, -0.5f  },
+        };
+        
+        enum{
+            TOP, BOTTOM, FRONT, BACK, LEFT, RIGHT
+        };
+
+        static float rotation_x = 30.f;
+        static float rotation_y = 0.f;
+        rotation_y += 5.f;
+        if(rotation_y >= 360.f)
+            rotation_y -= 360.f;
+        
+        int face_queue[3];
+
+        if(rotation_y < 45.f)
         {
-            case 0:
-                drw_rect(drw, x, i, bh-i, 1, 1, 2);
-            break;
-            case 1:
-                drw_rect(drw, x + bh-i-1, i, i+1, 1, 1, 2);
-            break;
-            case 2:
-                drw_rect(drw, x + i, i, bh, 1, 1, 2);
-            break;
-            case 3:
-                drw_rect(drw, x, i, i+1, 1, 1, 2);
+            face_queue[2] = BOTTOM;
+            face_queue[0] = RIGHT;
+            face_queue[1] = FRONT;
         }
+        else if(rotation_y < 90.f)
+        {
+            face_queue[0] = BOTTOM;
+            face_queue[1] = FRONT;
+            face_queue[2] = RIGHT;
+        }
+        else if(rotation_y < 135.f)
+        {
+            face_queue[0] = BOTTOM;
+            face_queue[1] = BACK;
+            face_queue[2] = RIGHT;
+        }
+        else if(rotation_y < 180.f)
+        {
+            face_queue[2] = TOP;
+            face_queue[0] = RIGHT;
+            face_queue[1] = BACK;
+        }
+        else if(rotation_y < 225.f)
+        {
+            face_queue[2] = TOP;
+            face_queue[0] = LEFT;
+            face_queue[1] = BACK;
+        }
+        else if(rotation_y < 270.f)
+        {
+            face_queue[0] = TOP;
+            face_queue[1] = BACK;
+            face_queue[2] = LEFT;
+        }
+        else if(rotation_y < 315.f)
+        {
+            face_queue[0] = BOTTOM;
+            face_queue[1] = FRONT;
+            face_queue[2] = LEFT;
+        }
+        else 
+        {
+            face_queue[2] = BOTTOM;
+            face_queue[0] = LEFT;
+            face_queue[1] = FRONT;
+        }
+
+        int t_queue[6];
+        for(int i = 0; i < 3; i++)
+        {
+            t_queue[i*2] = face_queue[i] * 2;
+            t_queue[i*2+1] = face_queue[i] * 2 + 1;
+        }
+
+        drw_setscheme(drw, scheme[SchemeSel]);
+        unsigned long int color = drw->scheme[ColBg].pixel;
+        unsigned char rgb[3] = {
+            color >> 16,
+            color >> 8,
+            color
+        };
+        unsigned long int colors[3] = { 
+            color,
+            (rgb[0]/2 >> 16) + (rgb[1]/2 >> 8) + rgb[2] + ((rgb[0]/2) >> 16) * ((int)rotation_y % 90) / 90.f + ((rgb[1]/2) >> 8) * ((int)rotation_y % 90) / 90.f + (rgb[2]/2) * ((int)rotation_y % 90) / 90.f,
+            rgb[2] / 2 + rgb[2] / 2 * (85.f - rotation_y) / 180.f,
+        };
+
+
+
+        const double DEG_TO_RAD = 0.01745329252f;
+        for(int tr = 0; tr < 6; tr++)
+        {
+            triangle t_rotated_x;
+            for(int i = 0; i < 3; i++)
+            {
+                t_rotated_x.v[i].x = t[t_queue[tr]].v[i].x;
+                t_rotated_x.v[i].y = t[t_queue[tr]].v[i].y * cosf(rotation_x * DEG_TO_RAD) + t[t_queue[tr]].v[i].z * sinf(rotation_x * DEG_TO_RAD);
+                t_rotated_x.v[i].z = t[t_queue[tr]].v[i].y * -sinf(rotation_x * DEG_TO_RAD) + t[t_queue[tr]].v[i].z * cosf(rotation_x * DEG_TO_RAD);
+            }
+            triangle t_rotated_y;
+            for(int i = 0; i < 3; i++)
+            {
+                t_rotated_y.v[i].x = t_rotated_x.v[i].x * cosf(rotation_y * DEG_TO_RAD) + t_rotated_x.v[i].z * sinf(rotation_y * DEG_TO_RAD);
+                t_rotated_y.v[i].y = t_rotated_x.v[i].y;
+                t_rotated_y.v[i].z = t_rotated_x.v[i].x * -sinf(rotation_y * DEG_TO_RAD) + t_rotated_x.v[i].z * cosf(rotation_y * DEG_TO_RAD);
+            }
+            triangle t_projected;
+            for(int i = 0; i < 3; i++)
+            {
+                t_projected.v[i].x = ((t_rotated_y.v[i].x / (t_rotated_y.v[i].z + 1.2f)) + 1.f) / 2.f * bh;
+                t_projected.v[i].y = ((t_rotated_y.v[i].y / (t_rotated_y.v[i].z + 1.2f)) + 1.f) / 2.f * bh;
+            }
+            drw_triangle(drw, &t_projected, bh, x, colors[tr/2]);
+        }
+
         x += bh;
     }
 

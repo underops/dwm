@@ -2,6 +2,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
+#include <math.h>
 #include <X11/Xlib.h>
 #include <X11/Xft/Xft.h>
 
@@ -251,6 +252,76 @@ drw_rect(Drw *drw, int x, int y, unsigned int w, unsigned int h, int filled, int
 	else
 		XDrawRectangle(drw->dpy, drw->drawable, drw->gc, x, y, w - 1, h - 1);
 }
+
+void
+drw_line(Drw *drw, float x1, float x2, int y, unsigned int w, int x, unsigned long int color)
+{
+    if(x1 > x2)
+    {
+        float a = x1;
+        x1 = x2;
+        x2 = a;
+    }
+
+    int x1r = floor(x1);
+    int x2r =  ceil(x2);
+
+    if(y < 0 || y > w) return;
+    if(x1r < 0) x1r = 0;
+    if(x2r > w) x2r = w;
+
+    XSetForeground(drw->dpy, drw->gc, color);
+    XDrawLine(drw->dpy, drw->drawable, drw->gc, x1r + x, y, x2r + x, y);
+}
+
+void
+vec2_swap(vec2 *v1, vec2 *v2)
+{
+    vec2 a = {v2->x, v2->y};
+    v2->x = v1->x;
+    v2->y = v1->y;
+    v1->x = a.x;
+    v1->y = a.y;
+}
+
+void
+drw_triangle(Drw *drw, triangle *tr, int w, int x, unsigned long int color)
+{
+    vec2 v[3];
+    for(int i = 0; i < 3; i++)
+    {
+        v[i].x = tr->v[i].x;
+        v[i].y = tr->v[i].y;
+    }
+
+    if(v[1].y < v[0].y) vec2_swap(&v[1], &v[0]);
+    if(v[2].y < v[0].y) vec2_swap(&v[2], &v[0]);
+    if(v[2].y < v[1].y) vec2_swap(&v[2], &v[1]);
+
+
+    vec2 t = v[0];
+    vec2 b = v[2];
+    vec2 m = v[1];
+    vec2 m2 = { ((b.x-t.x)/(b.y-t.y))*(m.y-t.y) + t.x, m.y };
+    vec2 ml, mr;
+    if(m.x < m2.x){ ml = m; mr = m2; }
+    else          { ml = m2; mr = m; }
+
+    float il = (ml.x-t.x)/(ml.y-t.y);
+    float ir = (mr.x-t.x)/(mr.y-t.y);
+
+    for(int i = 0; i < ml.y - t.y; i++)
+        drw_line(drw, il*i + t.x, ir*i + t.x, i + t.y, w, x, color);
+
+    if(b.y == ml.y) il = 0;
+    else il = (b.x - ml.x)/(b.y - ml.y);
+    if(b.y == mr.y) ir = 0;
+    else ir = (b.x - mr.x)/(b.y - mr.y);
+
+    for(int i = 0; i <= b.y - ml.y; i++)
+        drw_line(drw, il*i + ml.x, ir*i + mr.x, i + ml.y, w, x, color);
+}
+
 
 int
 drw_text(Drw *drw, int x, int y, unsigned int w, unsigned int h, unsigned int lpad, const char *text, int invert)
