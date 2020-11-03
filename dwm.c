@@ -1021,23 +1021,23 @@ drawbar(Monitor *m)
         drw_rect(drw, x, 0, bh, bh, 1, 1);
         triangle t[] = {
 
-            {  -0.5f, -0.5f, -0.5f ,  -0.5f, -0.5f,  0.5f ,   0.5f, -0.5f, -0.5f  },
-            {  -0.5f, -0.5f,  0.5f ,   0.5f, -0.5f,  0.5f ,   0.5f, -0.5f, -0.5f  },
+            {  -0.5f, -0.5f, -0.5f,  -0.5f, -0.5f,  0.5f,   0.5f, -0.5f, -0.5f  },
+            {  -0.5f, -0.5f,  0.5f,   0.5f, -0.5f,  0.5f,   0.5f, -0.5f, -0.5f  },
 
-            {  -0.5f,  0.5f, -0.5f ,  -0.5f,  0.5f,  0.5f ,   0.5f,  0.5f, -0.5f  },
-            {  -0.5f,  0.5f,  0.5f ,   0.5f,  0.5f,  0.5f ,   0.5f,  0.5f, -0.5f  },
+            {  -0.5f,  0.5f,  0.5f,  -0.5f,  0.5f, -0.5f,   0.5f,  0.5f, -0.5f  },
+            {   0.5f,  0.5f,  0.5f,  -0.5f,  0.5f,  0.5f,   0.5f,  0.5f, -0.5f  },
 
-            {  -0.5f, -0.5f, -0.5f ,   0.5f, -0.5f, -0.5f ,  -0.5f,  0.5f, -0.5f  },
-            {   0.5f, -0.5f, -0.5f ,   0.5f,  0.5f, -0.5f ,  -0.5f,  0.5f, -0.5f  }, 
+            {  -0.5f, -0.5f, -0.5f,   0.5f, -0.5f, -0.5f,  -0.5f,  0.5f, -0.5f  },
+            {   0.5f, -0.5f, -0.5f,   0.5f,  0.5f, -0.5f,  -0.5f,  0.5f, -0.5f  }, 
             
-            {  -0.5f, -0.5f,  0.5f ,   0.5f, -0.5f,  0.5f ,  -0.5f,  0.5f,  0.5f  },
-            {   0.5f, -0.5f,  0.5f ,   0.5f,  0.5f,  0.5f ,  -0.5f,  0.5f,  0.5f  }, 
+            {   0.5f, -0.5f,  0.5f,  -0.5f, -0.5f,  0.5f,  -0.5f,  0.5f,  0.5f  },
+            {   0.5f,  0.5f,  0.5f,   0.5f, -0.5f,  0.5f,  -0.5f,  0.5f,  0.5f  }, 
 
-            {  -0.5f, -0.5f, -0.5f ,  -0.5f, -0.5f,  0.5f ,  -0.5f,  0.5f, -0.5f  },
-            {  -0.5f, -0.5f,  0.5f ,  -0.5f,  0.5f,  0.5f ,  -0.5f,  0.5f, -0.5f  },
+            {  -0.5f, -0.5f,  0.5f,  -0.5f, -0.5f, -0.5f,  -0.5f,  0.5f, -0.5f  },
+            {  -0.5f,  0.5f,  0.5f,  -0.5f, -0.5f,  0.5f,  -0.5f,  0.5f, -0.5f  },
 
-            {   0.5f, -0.5f, -0.5f ,   0.5f, -0.5f,  0.5f ,   0.5f,  0.5f, -0.5f  },
-            {   0.5f, -0.5f,  0.5f ,   0.5f,  0.5f,  0.5f ,   0.5f,  0.5f, -0.5f  },
+            {   0.5f, -0.5f, -0.5f,   0.5f, -0.5f,  0.5f,   0.5f,  0.5f, -0.5f  },
+            {   0.5f, -0.5f,  0.5f,   0.5f,  0.5f,  0.5f,   0.5f,  0.5f, -0.5f  },
         };
         
         enum{
@@ -1109,19 +1109,6 @@ drawbar(Monitor *m)
         }
 
         drw_setscheme(drw, scheme[SchemeSel]);
-        unsigned long int color = drw->scheme[ColBg].pixel;
-        unsigned char rgb[3] = {
-            color >> 16,
-            color >> 8,
-            color
-        };
-        unsigned long int colors[3] = { 
-            color,
-            (rgb[0]/2 >> 16) + (rgb[1]/2 >> 8) + rgb[2] + ((rgb[0]/2) >> 16) * ((int)rotation_y % 90) / 90.f + ((rgb[1]/2) >> 8) * ((int)rotation_y % 90) / 90.f + (rgb[2]/2) * ((int)rotation_y % 90) / 90.f,
-            rgb[2] / 2 + rgb[2] / 2 * (85.f - rotation_y) / 180.f,
-        };
-
-
 
         const double DEG_TO_RAD = 0.01745329252f;
         for(int tr = 0; tr < 6; tr++)
@@ -1140,13 +1127,33 @@ drawbar(Monitor *m)
                 t_rotated_y.v[i].y = t_rotated_x.v[i].y;
                 t_rotated_y.v[i].z = t_rotated_x.v[i].x * -sinf(rotation_y * DEG_TO_RAD) + t_rotated_x.v[i].z * cosf(rotation_y * DEG_TO_RAD);
             }
+
+            vec3 normal, l1, l2;
+
+            l1.x = t_rotated_y.v[1].x - t_rotated_y.v[0].x;
+            l1.y = t_rotated_y.v[1].y - t_rotated_y.v[0].y;
+            l1.z = t_rotated_y.v[1].z - t_rotated_y.v[0].z;
+
+            l2.x = t_rotated_y.v[2].x - t_rotated_y.v[0].x;
+            l2.y = t_rotated_y.v[2].y - t_rotated_y.v[0].y;
+            l2.z = t_rotated_y.v[2].z - t_rotated_y.v[0].z;
+
+            normal.x = l1.y * l2.z - l1.z * l2.y;
+            normal.y = l1.z * l2.x - l1.x * l2.z;
+            normal.z = l1.x * l2.y - l1.y * l2.x;
+
+            normal.z /= sqrtf(normal.x * normal.x + normal.y * normal.y + normal.z * normal.z);
+
             triangle t_projected;
             for(int i = 0; i < 3; i++)
             {
                 t_projected.v[i].x = ((t_rotated_y.v[i].x / (t_rotated_y.v[i].z + 1.2f)) + 1.f) / 2.f * bh;
                 t_projected.v[i].y = ((t_rotated_y.v[i].y / (t_rotated_y.v[i].z + 1.2f)) + 1.f) / 2.f * bh;
             }
-            drw_triangle(drw, &t_projected, bh, x, colors[tr/2]);
+            
+            unsigned long int color = drw->scheme[ColBg].pixel;
+            color = ((unsigned int)((char)(color >> 16) * (normal.z + 1.f) / 2) << 16) + ((unsigned int)((char)(color >> 8) * (normal.z + 1.f) / 2) << 8) + ((char)(color) * (normal.z + 1.f) / 2); 
+            drw_triangle(drw, &t_projected, bh, x, color);
         }
 
         x += bh;
