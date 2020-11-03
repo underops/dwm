@@ -1046,7 +1046,7 @@ drawbar(Monitor *m)
 
         static float rotation_x = 30.f;
         static float rotation_y = 0.f;
-        rotation_y += 5.f;
+        rotation_y += 15.f;
         if(rotation_y >= 360.f)
             rotation_y -= 360.f;
         
@@ -1147,8 +1147,8 @@ drawbar(Monitor *m)
             triangle t_projected;
             for(int i = 0; i < 3; i++)
             {
-                t_projected.v[i].x = ((t_rotated_y.v[i].x / (t_rotated_y.v[i].z + 1.2f)) + 1.f) / 2.f * bh;
-                t_projected.v[i].y = ((t_rotated_y.v[i].y / (t_rotated_y.v[i].z + 1.2f)) + 1.f) / 2.f * bh;
+                t_projected.v[i].x = ((t_rotated_y.v[i].x / (t_rotated_y.v[i].z + 1.25f)) + 1.f) / 2.f * bh;
+                t_projected.v[i].y = ((t_rotated_y.v[i].y / (t_rotated_y.v[i].z + 1.25f)) + 1.f) / 2.f * bh;
             }
             
             unsigned long int color = drw->scheme[ColBg].pixel;
