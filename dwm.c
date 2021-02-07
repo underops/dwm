@@ -1020,139 +1020,105 @@ drawbar(Monitor *m)
     {
         drw_rect(drw, x, 0, bh, bh, 1, 1);
         triangle t[] = {
+            {{ { -0.5f, -0.5f, -0.5f }, { -0.5f, -0.5f,  0.5f }, {  0.5f, -0.5f, -0.5f } }},
+            {{ { -0.5f, -0.5f,  0.5f }, {  0.5f, -0.5f,  0.5f }, {  0.5f, -0.5f, -0.5f } }},
 
-            {  -0.5f, -0.5f, -0.5f,  -0.5f, -0.5f,  0.5f,   0.5f, -0.5f, -0.5f  },
-            {  -0.5f, -0.5f,  0.5f,   0.5f, -0.5f,  0.5f,   0.5f, -0.5f, -0.5f  },
+            {{ { -0.5f,  0.5f,  0.5f }, { -0.5f,  0.5f, -0.5f }, {  0.5f,  0.5f, -0.5f } }},
+            {{ {  0.5f,  0.5f,  0.5f }, { -0.5f,  0.5f,  0.5f }, {  0.5f,  0.5f, -0.5f } }},
 
-            {  -0.5f,  0.5f,  0.5f,  -0.5f,  0.5f, -0.5f,   0.5f,  0.5f, -0.5f  },
-            {   0.5f,  0.5f,  0.5f,  -0.5f,  0.5f,  0.5f,   0.5f,  0.5f, -0.5f  },
+            {{ { -0.5f, -0.5f, -0.5f }, {  0.5f, -0.5f, -0.5f }, { -0.5f,  0.5f, -0.5f } }},
+            {{ {  0.5f, -0.5f, -0.5f }, {  0.5f,  0.5f, -0.5f }, { -0.5f,  0.5f, -0.5f } }}, 
 
-            {  -0.5f, -0.5f, -0.5f,   0.5f, -0.5f, -0.5f,  -0.5f,  0.5f, -0.5f  },
-            {   0.5f, -0.5f, -0.5f,   0.5f,  0.5f, -0.5f,  -0.5f,  0.5f, -0.5f  }, 
-            
-            {   0.5f, -0.5f,  0.5f,  -0.5f, -0.5f,  0.5f,  -0.5f,  0.5f,  0.5f  },
-            {   0.5f,  0.5f,  0.5f,   0.5f, -0.5f,  0.5f,  -0.5f,  0.5f,  0.5f  }, 
+            {{ {  0.5f, -0.5f,  0.5f }, { -0.5f, -0.5f,  0.5f }, {  0.5f,  0.5f,  0.5f } }},
+            {{ {  0.5f,  0.5f,  0.5f }, { -0.5f, -0.5f,  0.5f }, { -0.5f,  0.5f,  0.5f } }}, 
 
-            {  -0.5f, -0.5f,  0.5f,  -0.5f, -0.5f, -0.5f,  -0.5f,  0.5f, -0.5f  },
-            {  -0.5f,  0.5f,  0.5f,  -0.5f, -0.5f,  0.5f,  -0.5f,  0.5f, -0.5f  },
+            {{ { -0.5f, -0.5f,  0.5f }, { -0.5f, -0.5f, -0.5f }, { -0.5f,  0.5f,  0.5f } }},
+            {{ { -0.5f,  0.5f,  0.5f }, { -0.5f, -0.5f, -0.5f }, { -0.5f,  0.5f, -0.5f } }},
 
-            {   0.5f, -0.5f, -0.5f,   0.5f, -0.5f,  0.5f,   0.5f,  0.5f, -0.5f  },
-            {   0.5f, -0.5f,  0.5f,   0.5f,  0.5f,  0.5f,   0.5f,  0.5f, -0.5f  },
+            {{ {  0.5f, -0.5f, -0.5f }, {  0.5f, -0.5f,  0.5f }, {  0.5f,  0.5f, -0.5f } }},
+            {{ {  0.5f, -0.5f,  0.5f }, {  0.5f,  0.5f,  0.5f }, {  0.5f,  0.5f, -0.5f } }},
         };
         
-        enum{
-            TOP, BOTTOM, FRONT, BACK, LEFT, RIGHT
-        };
-
         static float rotation_x = 30.f;
         static float rotation_y = 0.f;
-        rotation_y += 15.f;
+        rotation_y += 10.f;
         if(rotation_y >= 360.f)
             rotation_y -= 360.f;
-        
-        int face_queue[3];
-
-        if(rotation_y < 45.f)
-        {
-            face_queue[2] = BOTTOM;
-            face_queue[0] = RIGHT;
-            face_queue[1] = FRONT;
-        }
-        else if(rotation_y < 90.f)
-        {
-            face_queue[0] = BOTTOM;
-            face_queue[1] = FRONT;
-            face_queue[2] = RIGHT;
-        }
-        else if(rotation_y < 135.f)
-        {
-            face_queue[0] = BOTTOM;
-            face_queue[1] = BACK;
-            face_queue[2] = RIGHT;
-        }
-        else if(rotation_y < 180.f)
-        {
-            face_queue[2] = TOP;
-            face_queue[0] = RIGHT;
-            face_queue[1] = BACK;
-        }
-        else if(rotation_y < 225.f)
-        {
-            face_queue[2] = TOP;
-            face_queue[0] = LEFT;
-            face_queue[1] = BACK;
-        }
-        else if(rotation_y < 270.f)
-        {
-            face_queue[0] = TOP;
-            face_queue[1] = BACK;
-            face_queue[2] = LEFT;
-        }
-        else if(rotation_y < 315.f)
-        {
-            face_queue[0] = BOTTOM;
-            face_queue[1] = FRONT;
-            face_queue[2] = LEFT;
-        }
-        else 
-        {
-            face_queue[2] = BOTTOM;
-            face_queue[0] = LEFT;
-            face_queue[1] = FRONT;
-        }
-
-        int t_queue[6];
-        for(int i = 0; i < 3; i++)
-        {
-            t_queue[i*2] = face_queue[i] * 2;
-            t_queue[i*2+1] = face_queue[i] * 2 + 1;
-        }
 
         drw_setscheme(drw, scheme[SchemeSel]);
 
         const double DEG_TO_RAD = 0.01745329252f;
-        for(int tr = 0; tr < 6; tr++)
+        triangle t_rotated_y[12];
+        for(int tr = 0; tr < 12; tr++)
         {
             triangle t_rotated_x;
             for(int i = 0; i < 3; i++)
             {
-                t_rotated_x.v[i].x = t[t_queue[tr]].v[i].x;
-                t_rotated_x.v[i].y = t[t_queue[tr]].v[i].y * cosf(rotation_x * DEG_TO_RAD) + t[t_queue[tr]].v[i].z * sinf(rotation_x * DEG_TO_RAD);
-                t_rotated_x.v[i].z = t[t_queue[tr]].v[i].y * -sinf(rotation_x * DEG_TO_RAD) + t[t_queue[tr]].v[i].z * cosf(rotation_x * DEG_TO_RAD);
+                t_rotated_x.v[i].x = t[tr].v[i].x;
+                t_rotated_x.v[i].y = t[tr].v[i].y *  cosf(rotation_x * DEG_TO_RAD) + t[tr].v[i].z * sinf(rotation_x * DEG_TO_RAD);
+                t_rotated_x.v[i].z = t[tr].v[i].y * -sinf(rotation_x * DEG_TO_RAD) + t[tr].v[i].z * cosf(rotation_x * DEG_TO_RAD);
             }
-            triangle t_rotated_y;
             for(int i = 0; i < 3; i++)
             {
-                t_rotated_y.v[i].x = t_rotated_x.v[i].x * cosf(rotation_y * DEG_TO_RAD) + t_rotated_x.v[i].z * sinf(rotation_y * DEG_TO_RAD);
-                t_rotated_y.v[i].y = t_rotated_x.v[i].y;
-                t_rotated_y.v[i].z = t_rotated_x.v[i].x * -sinf(rotation_y * DEG_TO_RAD) + t_rotated_x.v[i].z * cosf(rotation_y * DEG_TO_RAD);
+                t_rotated_y[tr].v[i].x = t_rotated_x.v[i].x * cosf(rotation_y * DEG_TO_RAD) + t_rotated_x.v[i].z * sinf(rotation_y * DEG_TO_RAD);
+                t_rotated_y[tr].v[i].y = t_rotated_x.v[i].y;
+                t_rotated_y[tr].v[i].z = t_rotated_x.v[i].x * -sinf(rotation_y * DEG_TO_RAD) + t_rotated_x.v[i].z * cosf(rotation_y * DEG_TO_RAD) + 1.2f;
             }
+        }
 
-            vec3 normal, l1, l2;
+        int tqueue[12];
+        float ztotal[12];
 
-            l1.x = t_rotated_y.v[1].x - t_rotated_y.v[0].x;
-            l1.y = t_rotated_y.v[1].y - t_rotated_y.v[0].y;
-            l1.z = t_rotated_y.v[1].z - t_rotated_y.v[0].z;
+        for(int i = 0; i < 12; i++)
+        {
+            tqueue[i] = i;
+            ztotal[i] = t_rotated_y[i].v[0].z + t_rotated_y[i].v[1].z + t_rotated_y[i].v[2].z;
+        }
 
-            l2.x = t_rotated_y.v[2].x - t_rotated_y.v[0].x;
-            l2.y = t_rotated_y.v[2].y - t_rotated_y.v[0].y;
-            l2.z = t_rotated_y.v[2].z - t_rotated_y.v[0].z;
+        for(int i = 0; i < 12; i++)
+            for(int j = 0; j < 11; j++)
+                if(ztotal[j] < ztotal[j+1])
+                {
+                    float af = ztotal[j];
+                    ztotal[j] = ztotal[j+1];
+                    ztotal[j+1] = af;
+                    int ai = tqueue[j];
+                    tqueue[j] = tqueue[j+1];
+                    tqueue[j+1] = ai;
+                }
 
-            normal.x = l1.y * l2.z - l1.z * l2.y;
-            normal.y = l1.z * l2.x - l1.x * l2.z;
-            normal.z = l1.x * l2.y - l1.y * l2.x;
+        for(int tr = 6; tr < 12; tr++)
+        {
+            vec3 v, w, normal;
 
-            normal.z /= sqrtf(normal.x * normal.x + normal.y * normal.y + normal.z * normal.z);
+            v.x = t_rotated_y[tqueue[tr]].v[1].x - t_rotated_y[tqueue[tr]].v[0].x;
+            v.y = t_rotated_y[tqueue[tr]].v[1].y - t_rotated_y[tqueue[tr]].v[0].y;
+            v.z = t_rotated_y[tqueue[tr]].v[1].z - t_rotated_y[tqueue[tr]].v[0].z;
+
+            w.x = t_rotated_y[tqueue[tr]].v[2].x - t_rotated_y[tqueue[tr]].v[0].x;
+            w.y = t_rotated_y[tqueue[tr]].v[2].y - t_rotated_y[tqueue[tr]].v[0].y;
+            w.z = t_rotated_y[tqueue[tr]].v[2].z - t_rotated_y[tqueue[tr]].v[0].z;
+
+            normal.x = (v.y * w.z) - (v.z * w.y);
+            normal.y = (v.z * w.x) - (v.x * w.z);
+            normal.z = (v.x * w.y) - (v.y * w.x);
+
+            float l = sqrtf(normal.x * normal.x + normal.y * normal.y + normal.z * normal.z);
+            normal.x /= l;
+            normal.y /= l;
+            normal.z /= l;
+            float light = (( -normal.x + normal.y + normal.z + .5f) / 3.f + 1.f) / 2.f;
 
             triangle t_projected;
-            for(int i = 0; i < 3; i++)
-            {
-                t_projected.v[i].x = ((t_rotated_y.v[i].x / (t_rotated_y.v[i].z + 1.25f)) + 1.f) / 2.f * bh;
-                t_projected.v[i].y = ((t_rotated_y.v[i].y / (t_rotated_y.v[i].z + 1.25f)) + 1.f) / 2.f * bh;
+            for(int i = 0; i < 3; i++) {
+                t_projected.v[i].x = ((t_rotated_y[tqueue[tr]].v[i].x / (t_rotated_y[tqueue[tr]].v[i].z)) + 1.f) / 2.f * bh;
+                t_projected.v[i].y = ((t_rotated_y[tqueue[tr]].v[i].y / (t_rotated_y[tqueue[tr]].v[i].z)) + 1.f) / 2.f * bh;
             }
             
             unsigned long int color = drw->scheme[ColBg].pixel;
-            color = ((unsigned int)((char)(color >> 16) * (normal.z + 1.f) / 2) << 16) + ((unsigned int)((char)(color >> 8) * (normal.z + 1.f) / 2) << 8) + ((char)(color) * (normal.z + 1.f) / 2); 
+            color = ((unsigned int)((char)(color >> 16) * light) << 16) +
+                    ((unsigned int)((char)(color >>  8) * light) <<  8) +
+                    ((char)(color) * light); 
             drw_triangle(drw, &t_projected, bh, x, color);
         }
 
